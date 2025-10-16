@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherry Court Timer - Public Scoreboard</title>
+    <link rel="stylesheet" href="cherry-styles.css">
+    <script src="cherry-logic.js"></script>
+</head>
+<body class="public-view">
+
+<div class="info-bar">
+    <span id="periodInfo">PERIOD 1 OF 4</span>
+    <span id="statusInfo">PAUSED</span>
+</div>
+
+<div class="scoreboard-grid">
+
+    <div class="team-score-container team-local">
+        <div class="team-name" id="localNameDisplay">LOCAL</div>
+        <div class="team-score" id="localScoreDisplay">0</div>
+    </div>
+
+    <div id="timerDisplay">00:00</div>
+
+    <div class="team-score-container team-guest">
+        <div class="team-name" id="guestNameDisplay">GUEST</div>
+        <div class="team-score" id="guestScoreDisplay">0</div>
+    </div>
+
+</div>
+
+<script>
+    // ===============================================
+    // Public Scoreboard Display Synchronization
+    // ===============================================
+
+    /**
+     * Updates the public scoreboard display using the current gameState.
+     */
+    function updatePublicDisplay(state) {
+        if (!state) return;
+
+        // 1. Update Team Info (Names and Colors) - Only needed once, but safe to run repeatedly
+        document.getElementById('localNameDisplay').textContent = state.nameLocal.toUpperCase();
+        document.getElementById('guestNameDisplay').textContent = state.nameGuest.toUpperCase();
+
+        // Apply dynamic colors using CSS variables
+        document.documentElement.style.setProperty('--team-local-color', state.colorLocal);
+        document.documentElement.style.setProperty('--team-guest-color', state.colorGuest);
+
+        // 2. Update Scores
+        document.getElementById('localScoreDisplay').textContent = state.scoreLocal;
+        document.getElementById('guestScoreDisplay').textContent = state.scoreGuest;
+
+        // 3. Update Timer and Status
+        document.getElementById('timerDisplay').textContent = formatTime(state.timeRemaining);
+
+        // Update Info Bar
+        document.getElementById('periodInfo').textContent = `PERIOD ${state.currentPeriod} OF ${state.totalPeriods}`;
+        document.getElementById('statusInfo').textContent = state.isRunning ? 'RUNNING' : 'PAUSED';
+
+        // Optional: Visually indicate running/paused state on the timer
+        document.getElementById('timerDisplay').style.color = state.isRunning ? '#4CAF50' : '#FFC107'; // Green for RUNNING, Amber for PAUSED
+    }
+
+
+    /**
+     * Main loop for public scoreboard synchronization.
+     * It constantly polls (reads) the latest state from localStorage.
+     */
+    function syncLoop() {
+        // 1. Read the latest state from localStorage
+        const storedData = localStorage.getItem('cherryCourtTimerConfig');
+        if (storedData) {
+            try {
+                const latestState = JSON.parse(storedData);
+                updatePublicDisplay(latestState);
+            } catch (e) {
+                console.error("Error parsing stored game state for public display:", e);
+            }
+        }
+    }
+
+    // Start the synchronization loop every 100 milliseconds for a smooth update
+    // This is the core of the LocalStorage-based real-time update
+    setInterval(syncLoop, 100);
+
+    // Also run once immediately on load
+    syncLoop();
+</script>
+
+</body>
+</html>

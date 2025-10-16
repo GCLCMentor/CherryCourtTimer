@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherry Court Timer - Game Configuration</title>
+    <link rel="stylesheet" href="cherry-styles.css">
+    <style>
+        /* Specific styles for the configuration (form centering) */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0; /* Light background for admin/config */
+        }
+        .config-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        .config-container h1 {
+            text-align: center;
+            color: #C20A2F; /* Cherry Color */
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        /* Style for standard inputs (Text, Number, Select) */
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Fieldset and Legend Styles for better visual separation */
+        fieldset {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px; /* Added spacing to separate sections */
+            border-radius: 4px;
+        }
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+            color: #C20A2F;
+        }
+
+        /* NEW: Flexbox container for Color Picker to ensure label and input are visible side-by-side */
+        .color-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .color-group label {
+            flex-grow: 1; /* Label takes up available space */
+            margin: 0;
+            font-weight: bold;
+        }
+        .color-group input[type="color"] {
+            width: 50px;
+            height: 30px;
+            vertical-align: middle;
+            padding: 0;
+            border: 1px solid #ccc;
+            box-sizing: content-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #C20A2F; /* Cherry Button */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #9c0825;
+        }
+    </style>
+</head>
+<body>
+
+<div class="config-container">
+    <h1>Cherry Court Timer</h1>
+    <h2>Game Configuration</h2>
+    <form id="configForm">
+
+        <div class="form-group">
+            <label for="sportType">Sport Type:</label>
+            <select id="sportType" required>
+                <option value="">-- Select Sport --</option>
+                <option value="basketball">Basketball</option>
+                <option value="soccer">Soccer</option>
+                <option value="volleyball">Volleyball</option>
+                <option value="generic">Generic</option>
+            </select>
+        </div>
+
+        <fieldset>
+            <legend>Home Team</legend>
+            <div class="form-group">
+                <label for="nameLocal">Name:</label>
+                <input type="text" id="nameLocal" value="HOME" required>
+            </div>
+            <div class="color-group"> <label for="colorLocal">Color:</label>
+                <input type="color" id="colorLocal" value="#CC0000">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Guest Team</legend>
+            <div class="form-group">
+                <label for="nameGuest">Name:</label>
+                <input type="text" id="nameGuest" value="GUEST" required>
+            </div>
+            <div class="color-group"> <label for="colorGuest">Color:</label>
+                <input type="color" id="colorGuest" value="#0000CC">
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Timing</legend>
+            <div class="form-group">
+                <label for="periodDuration">Period Duration (Minutes):</label>
+                <input type="number" id="periodDuration" value="10" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="totalPeriods">Number of Periods/Quarters/Sets:</label>
+                <input type="number" id="totalPeriods" value="4" min="1" required>
+            </div>
+        </fieldset>
+
+        <button type="submit">Start Game Control</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('configForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // 1. Collect all form data
+        const configData = {
+            sportType: document.getElementById('sportType').value,
+            nameLocal: document.getElementById('nameLocal').value,
+            colorLocal: document.getElementById('colorLocal').value,
+            nameGuest: document.getElementById('nameGuest').value,
+            colorGuest: document.getElementById('colorGuest').value,
+            periodDuration: parseInt(document.getElementById('periodDuration').value), // in minutes
+            totalPeriods: parseInt(document.getElementById('totalPeriods').value),
+
+            // Initialize game state
+            scoreLocal: 0,
+            scoreGuest: 0,
+            currentPeriod: 1,
+            timeRemaining: parseInt(document.getElementById('periodDuration').value) * 60, // in seconds
+            isRunning: false,
+
+            // Add start time for reference
+            startTime: new Date().toISOString()
+        };
+
+        // 2. Store data in localStorage (The key to synchronization)
+        try {
+            localStorage.setItem('cherryCourtTimerConfig', JSON.stringify(configData));
+
+            // 3. Redirect to the control panel
+            alert('Configuration saved. Opening Control Panel...');
+            window.location.href = 'control.html';
+        } catch (error) {
+            alert('Error saving configuration. Ensure your browser supports Local Storage.');
+            console.error(error);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherry Court Timer - Control Panel</title>
+    <link rel="stylesheet" href="cherry-styles.css">
+    <script src="cherry-logic.js"></script>
+    <style>
+        /* Specific control panel grid layout */
+        .control-panel {
+            grid-template-columns: repeat(3, 1fr); /* Time, Local Score, Guest Score */
+        }
+        .control-group.time-controls {
+            grid-column: 1 / 4; /* Time controls span the full width */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .time-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .score-buttons button {
+            width: 90%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body class="control-view">
+
+<div class="control-panel">
+
+    <div class="control-group time-controls">
+        <h3>Game Status</h3>
+        <p class="current-status" id="timerStatus">TIME: 00:00 | Period: 1 of 4 | Status: Paused</p>
+
+        <div class="time-buttons">
+            <button class="control-btn btn-time" id="startBtn" onclick="startTimer()">Start Timer</button>
+            <button class="control-btn btn-time" id="pauseBtn" onclick="pauseTimer()">Pause Timer</button>
+            <button class="control-btn btn-time" onclick="resetPeriodTimer()">Reset Period Time</button>
+            <button class="control-btn btn-time" onclick="nextPeriod()">Next Period</button>
+        </div>
+
+        <p style="margin-top: 20px;">
+            <a href="scoreboard-public.html" target="_blank">Open Public Scoreboard</a>
+        </p>
+    </div>
+
+    <div class="control-group" id="localTeamControls">
+        <h3 id="localTeamName">Local Team</h3>
+        <p class="current-status" id="localScoreDisplay">0</p>
+
+        <h4>Score Adjustments</h4>
+        <div class="score-buttons">
+            <button class="control-btn btn-score-local" onclick="updateScore('local', 1)">+1 Point</button>
+            <button class="control-btn btn-score-local" onclick="updateScore('local', 2)">+2 Points</button>
+            <button class="control-btn btn-score-local" onclick="updateScore('local', 3)">+3 Points</button>
+            <button class="control-btn btn-score-local" style="background-color: #999;" onclick="updateScore('local', -1)">-1 Point (Undo)</button>
+        </div>
+    </div>
+
+    <div class="control-group" id="guestTeamControls">
+        <h3 id="guestTeamName">Guest Team</h3>
+        <p class="current-status" id="guestScoreDisplay">0</p>
+
+        <h4>Score Adjustments</h4>
+        <div class="score-buttons">
+            <button class="control-btn btn-score-guest" onclick="updateScore('guest', 1)">+1 Point</button>
+            <button class="control-btn btn-score-guest" onclick="updateScore('guest', 2)">+2 Points</button>
+            <button class="control-btn btn-score-guest" onclick="updateScore('guest', 3)">+3 Points</button>
+            <button class="control-btn btn-score-guest" style="background-color: #999;" onclick="updateScore('guest', -1)">-1 Point (Undo)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===============================================
+    // Control Panel Initialization and Real-Time Display
+    // ===============================================
+
+    /**
+     * Updates all elements on the control panel based on the current gameState.
+     */
+    function updateControlDisplay() {
+        // 1. Update Game Status Bar
+        const statusText = `TIME: ${formatTime(gameState.timeRemaining)} | Period: ${gameState.currentPeriod} of ${gameState.totalPeriods} | Status: ${gameState.isRunning ? 'RUNNING' : 'PAUSED'}`;
+        document.getElementById('timerStatus').textContent = statusText;
+
+        // 2. Update Scores
+        document.getElementById('localScoreDisplay').textContent = gameState.scoreLocal;
+        document.getElementById('guestScoreDisplay').textContent = gameState.scoreGuest;
+
+        // 3. Update Button State (Start/Pause)
+        document.getElementById('startBtn').disabled = gameState.isRunning;
+        document.getElementById('pauseBtn').disabled = !gameState.isRunning;
+    }
+
+    /**
+     * Initializes the control panel with team names and colors from the configuration.
+     */
+    function initControlPanel() {
+        if (!gameState.nameLocal) {
+            // Fallback or redirection if gameState is not properly loaded
+            return;
+        }
+
+        // Set Team Names
+        document.getElementById('localTeamName').textContent = gameState.nameLocal.toUpperCase();
+        document.getElementById('guestTeamName').textContent = gameState.nameGuest.toUpperCase();
+
+        // Apply Team Colors to Buttons (Dynamic CSS)
+        const localControls = document.getElementById('localTeamControls');
+        const guestControls = document.getElementById('guestTeamControls');
+
+        // Set colors for score buttons
+        localControls.querySelectorAll('.btn-score-local').forEach(btn => {
+            btn.style.backgroundColor = gameState.colorLocal;
+        });
+        guestControls.querySelectorAll('.btn-score-guest').forEach(btn => {
+            btn.style.backgroundColor = gameState.colorGuest;
+        });
+
+        // Initial display update
+        updateControlDisplay();
+    }
+
+    // Function to continuously monitor and update the display in case the timer is running
+    // This is mainly for initial load, the interval inside startTimer handles continuous updates.
+    function runControlLoop() {
+        initControlPanel();
+
+        // Re-check for running timer status every 1 second to update the display status
+        // and if the timer was started in another tab (less critical now)
+        setInterval(updateControlDisplay, 1000);
+
+        // If the timer was running when the page was loaded/refreshed, restart the interval
+        if (gameState.isRunning) {
+            startTimer();
+        }
+    }
+
+    // Wait for the script (cherry-logic.js) to finish loading the state, then initialize.
+    document.addEventListener('DOMContentLoaded', runControlLoop);
+</script>
+
+</body>
+</html>

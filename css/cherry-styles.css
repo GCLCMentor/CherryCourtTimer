@@ -1,0 +1,172 @@
+/* ======================================= */
+/* General Styles for Cherry Court Timer */
+/* ======================================= */
+
+:root {
+    --cherry-red: #C20A2F;
+    --dark-bg: #1A1A1A; /* Dark background for the public scoreboard */
+    --light-text: #FFFFFF; /* White text for the public scoreboard */
+    --score-font: 'Arial Black', sans-serif; /* Impact font for the score */
+}
+
+/* Public View Styles (scoreboard-public.html) */
+body.public-view {
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Main scoreboard container */
+.scoreboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr; /* 2 Teams and Time in the center */
+    grid-template-rows: 1fr;
+    flex-grow: 1;
+}
+
+/* Main Timer Styles (the largest) */
+#timerDisplay {
+    grid-column: 2 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18vw; /* Huge for the large screen */
+    font-weight: bold;
+    color: #4CAF50; /* Distinctive color for time (green/amber) */
+    text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+}
+
+/* Team Section Styles */
+.team-score-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Specific styles for Home and Guest Teams (filled via JS) */
+.team-local {
+    grid-column: 1 / 2;
+    background-color: var(--team-local-color, #333); /* Defined in JS */
+}
+
+.team-guest {
+    grid-column: 3 / 4;
+    background-color: var(--team-guest-color, #333); /* Defined in JS */
+}
+
+/* Team Name */
+.team-name {
+    font-size: 4vw;
+    font-weight: 300;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+/* Team Score */
+.team-score {
+    font-size: 20vw; /* Score even larger than time */
+    font-family: var(--score-font);
+    line-height: 1;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Secondary Info Section (Period/Quarter) */
+.info-bar {
+    height: 10vh;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--cherry-red);
+    font-size: 4vw;
+    font-weight: bold;
+}
+
+/* ======================================= */
+/* Control View Styles (control.html) */
+/* ======================================= */
+
+body.control-view {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    padding: 20px;
+}
+
+.control-panel {
+    display: grid;
+    gap: 15px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.control-group {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.control-group h3 {
+    color: var(--cherry-red);
+    margin-top: 0;
+}
+
+/* Control Button Styles */
+.control-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.btn-time {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+.btn-time:hover { background-color: #43A047; }
+
+.btn-score-local, .btn-score-guest {
+    color: white;
+    font-weight: bold;
+}
+
+/* Current Status Display */
+.current-status {
+    font-size: 20px;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+/* Media Query for smaller screens (mobile/tablets) */
+@media (max-width: 600px) {
+    .control-panel {
+        grid-template-columns: 1fr;
+    }
+    .info-bar {
+        font-size: 6vw;
+    }
+    #timerDisplay {
+        font-size: 12vw;
+    }
+    .team-score {
+        font-size: 15vw;
+    }
+}
